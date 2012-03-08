@@ -12,13 +12,13 @@ before you push the next deployment that you should restart to clear permgen.
 
 ##What is it?
 
-A simple REST interface to the Jboss AS 7 memory metrics exposed by the JBoss CLI interfaces.
+A simple REST interface to the Jboss AS 7 memory metrics exposed by the JBoss [CLI interfaces](https://docs.jboss.org/author/display/AS7/Management+Clients).
 
 Provides a simple way to get permgen and heap stats on local dev instances of JBoss AS 7 so they 
 can be exposed through things like Conky or other monitoring tools. 
 
 Includes sample client implementations for:
-* conky
+* [Conky](http://conky.sourceforge.net/)
 * Syncrhonous Javascript
 * Asynchronous Javascript using JQuery
 * Embedded tiny javascript client
@@ -46,6 +46,6 @@ All you need to build and run this project is Java 6.0 (Java SDK 1.6) or better,
 You can copy the downloadable .war file to your JBOSS_HOME/standalone/deployments directory and then 
 navigate to: http://localhost:8080/jbas7MemoryProbe
 
-If you wish to build & deploy from source using Maven 3
+Or, if you wish to build & deploy from source using Maven 3 goals.
 	mvn package
 	mvn jboss-as:deploy
