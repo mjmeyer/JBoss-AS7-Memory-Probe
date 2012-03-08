@@ -1,0 +1,87 @@
+# A sample conky config demonstrating the use of the jbas7MemoryProbe REST resources
+# for jboss heap and permgen utilization
+#
+# Shows 3 examples of rendering these values in conky
+# 1) as simple text output
+# 2) using conky bargraphs
+# 3) using a custom lua script to render as ring graphs
+#
+# Assumes you have deployed jbas7MemoryProbe.war to your local jboss instance
+# running port 8080.
+# If youre running with a different config you will need to edit the urls used
+# in this script as well as the lua script referenced below.
+
+#########################
+# lua script ref. 
+# !!!  CHANGE this to the path you copied the rings lua script to
+#########################
+lua_load ~/.conkycolors/simple_rings/rings-v1.2.lua
+lua_draw_hook_pre conky_ring_stats
+
+
+######################
+# - Conky settings - #
+######################
+update_interval 1
+total_run_times 0
+net_avg_samples 1
+cpu_avg_samples 1
+
+imlib_cache_size 0
+double_buffer yes
+no_buffers yes
+
+format_human_readable
+
+#####################
+# - Text settings - #
+#####################
+use_xft yes
+xftfont Ubuntu:size=10
+override_utf8_locale yes
+text_buffer_size 2048
+
+#############################
+# - Window specifications - #
+#############################
+own_window_class Conky
+own_window yes
+own_window_type normal
+own_window_argb_visual yes
+own_window_argb_value 100
+own_window_transparent yes
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+alignment top_left
+gap_x 0
+gap_y 5
+minimum_size 160 999
+maximum_width 160
+default_bar_size 60 10
+
+#########################
+# - Graphics settings - #
+#########################
+draw_shades no
+
+default_color AAAAAA #labels
+color1 DDDDDD  #values
+
+TEXT 
+#########################
+# - Begin output - #
+#########################
+## simple text output of permgen & heap
+#
+Permgen used${color1}${alignr}${curl http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed 30}%${color}
+Heap used${color1}${alignr}${curl http://localhost:8080/jbas7MemoryProbe/rest/heap/percentUsed 30}%${color}
+
+## bargraphs of permgen & heap
+#
+Permgen used ${alignr}${execibar 30 curl http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed}
+Heap used ${alignr}${execibar 30 curl http://localhost:8080/jbas7MemoryProbe/rest/heap/percentUsed}
+
+## some text labels to line up with lua ring graphs drawn via rings-v1.2.lua
+${voffset 50}${offset 52}${font Ubuntu:style=bold:size=8}Permgen${font}
+${voffset 80}${offset 62}${font Ubuntu:style=bold:size=8}Heap${font}
+
+

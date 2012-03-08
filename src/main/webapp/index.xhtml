@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:h="http://java.sun.com/jsf/html"
+   template="/WEB-INF/templates/default.xhtml"
+   >
+   <ui:define name="head">
+   <h:outputScript name="js/jquery.popupWindow.js" target="head" />
+    
+   <script type="text/javascript">
+   $(document).ready(function(){
+		
+		getPermgenAjaxTimerTask(); // initial call to update on first page draw
+		self.setInterval ("getPermgenAjaxTimerTask()", 30 * 1000);
+		
+		$('.tinyOpener').popupWindow({ 
+			   height:40, 
+			   width:300, 
+			   location:0,
+			   top:50, 
+			   left:50 
+			   });
+	 });
+   </script>
+   
+   <script type="text/javascript" src="http://malsup.github.com/jquery.corner.js"></script>
+   
+   </ui:define>
+    <ui:define name="sidebar">
+    	<span style="font-size:larger; font-weight:bold">Tired of bringing down JBoss with your latest deploy because you forgot to check Permgen?
+    	</span>
+    	<P>
+    		It happens to all of us. We all know it's going to happen...just not when.<br />
+    		
+    	</P>
+    	<P>
+    		This small set of REST services will expose the Permgen and Heap memory status on your local Jboss AS 7 instance 
+    		allowing you to display
+    		it in your favorite system monitor or javascript component and know before you
+    		push the next deployment that you should restart to clear permgen.
+    	</P>
+    	 <h:graphicImage value="/resources/gfx/sample.png" alt="sample conky display of permgen" />
+    </ui:define>
+   <ui:define name="content">
+   <h2>JBoss AS 7 Memory Probe</h2>
+   A simple REST interface to the Jboss AS 7 memory metrics exposed 
+   by the JBoss <a href="https://docs.jboss.org/author/display/AS7/Management+Clients">CLI interfaces</a>.
+	<P>
+   Provides a simple way to get permgen and heap stats on local dev instances of JBoss AS 7 so they can be 
+   exposed through things like Conky or other monitoring tools.
+   </P>
+   
+   <div style="border-radius:10px; padding:12px;width:60%;margin:15px; background: #ddefdd" >
+	   <strong><a class="tinyOpener" title="open probe" href="tinyProbe.jsf">Open Tiny Probe</a></strong> - a small javascript probe displayed from this .war
+	   <br />
+	   or <br />
+	   use the REST services to display heap or permgen stats in your favorite monitor tool...
+   </div>
+    	
+   <h3>Available REST Resources</h3>
+   <h4>Permgen</h4>
+<ul>
+    <li><a href="rest/permgen">/rest/permgen</a> - permgen / non-heap memory stats as JSON string</li>
+	<li><a href="rest/permgen/percentUsed">/rest/permgen/percentUsed</a> - permgen / non-heap memory percent used as 
+	simple string. suitable for consumption by things like Conky or curl.</li>
+	<li><a href="rest/permgen/used">/rest/permgen/&lt;attribute&gt;</a> - Extracts the passed attribute from the JSON result and returns
+	as simple string suitable for consumption by things like Conky or curl.</li>
+</ul>
+   <h4>Heap</h4>
+<ul>
+	<li><a href="rest/heap">/rest/heap</a> - heap memory stats as JSON string</li>
+	<li><a href="rest/heap/percentUsed">/rest/heap/percentUsed</a> - heap memory percent used as 
+	simple string. suitable for consumption by things like Conky or curl.</li>
+	<li><a href="rest/heap/used">/rest/heap/&lt;attribute&gt;</a> - Extracts the passed attribute from the JSON result and returns
+	as simple string suitable for consumption by things like Conky or curl.</li>
+</ul>
+
+<h3>Sample usage from Conky</h3>
+<P><A href="http://conky.sourceforge.net/">Conky</A> is a free, light-weight system monitor for X. Typically used to display and graph system stats like CPU and RAM usage but widely
+extended to report a whole host of other things.</P>
+<P>Using the Conky curl object with this REST service makes it possible to have a visualization of the % permgen and heap used on your local Jboss instance.
+</P>
+<p>A conky config and a lua script are provided as examples to consume these REST services. </p>
+<ul>
+	<li><a href="resources/conky/conkyrc_example.txt">conkyrc_example</a></li>
+	<li><a href="resources/conky/rings-v1.2.lua">rings-v1.2.lua</a> 
+	<span style="font-size:smaller">
+	(based on the work of: londonali1010 
+	<A href="http://londonali1010.deviantart.com/art/quot-Rings-quot-Meters-for-Conky-141961783">
+	http://londonali1010.deviantart.com/art/quot-Rings-quot-Meters-for-Conky-141961783
+	</A>)
+	</span>
+	</li>
+</ul>
+
+<h3>Sample usage from Javascript</h3>
+
+<h4>Using Synchronous XMLHttpRequest</h4>
+<p>A simple synchronous javascript request against the permgen REST resource in this war.</p>
+<p>This is probably the best option if you dont want to run Conky and dont want to use JQuery in a client of your own making.</p>
+<input type="button" value="Get Permgen" onclick="getPermgenSynchronous();"/>
+<div style="border-radius:10px 10px 10px 10px;background: #cccccc; margin-top:5px; padding-top:5px;padding-left:15px;padding-bottom:5px;padding-right:15px;">
+<h:outputScript name="js/shBrushJScript.js" target="head" />
+<pre class="brush: js; toolbar: true;">
+function getPermgenSynchronous() {
+	var url = "http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed";
+	var client = new XMLHttpRequest();
+	client.open("GET", url, false);
+	client.setRequestHeader("Content-Type", "text/plain");
+	client.send();
+	if (client.status == 200)
+    	alert("The request succeeded!\n\nPercent Permgen Used:\n\n" 
+    		+ client.responseText + "%")
+	else
+    	alert("The request did not succeed!\n\nThe response status was: " 
+    		+ client.status + " " + client.statusText + ".");
+}
+</pre>
+</div>
+<script type="text/javascript">
+function getPermgenSynchronous() {
+	var url = "http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed";
+	var client = new XMLHttpRequest();
+	client.open("GET", url, false);
+	client.setRequestHeader("Content-Type", "text/plain");
+	client.send();
+	if (client.status == 200)
+    	alert("The request succeeded!\n\nPercent Permgen Used:\n\n" + client.responseText + "%")
+	else
+    	alert("The request did not succeed!\n\nThe response status was: " + 
+    			client.status + " " + client.statusText + ".");
+}
+</script>
+
+<hr />
+<h4>Using Asynchronous XMLHttpRequest (JQuery $ajax)</h4>
+<p>A simple asynchronous javascript request against a REST resource in this war. Depends on JQuery 1.5 or later.</p>
+<input type="button" value="Get Permgen via $ajax" onclick="getPermgenAjax();"/>
+<div style="border-radius:10px 10px 10px 10px;background: #cccccc; margin-top:5px; padding-top:5px;padding-left:15px;padding-bottom:5px;padding-right:15px;">
+<pre class="brush: js; toolbar: true;">
+function getPermgenAjax() {
+	$.ajax({
+	    url: 'http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed',
+	    type: 'GET',
+	    data: '', 
+	    error: function (jqXHR, status, error){
+	    	alert("The request did not succeed!\n\nThe response status was: " + 
+    			status + " " + error + "."); 
+	    	},
+	    success: function(data) {
+	    	alert('The request succeeded!\n\nPercent Permgen Used:\n\n' + data + '%'); 
+	    	}
+	});
+}
+</pre>
+</div>
+<script type="text/javascript">
+function getPermgenAjax() {
+	$.ajax({
+	    url: 'http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed',
+	    type: 'GET',
+	    data: '', 
+	    error: function (jqXHR, status, error){
+	    	alert("The request did not succeed!\n\nThe response status was: " + 
+    			status + " " + error + "."); 
+	    	},
+	    success: function(data) {
+	    	alert('The request succeeded!\n\nPercent Permgen Used:\n\n' + data + '%'); 
+	    	}
+	});
+}
+
+</script>
+<hr />
+<div style="border-radius:12px;background: #000023;float:right;height=70;width=70;padding:4px;margin-top:4px;">
+	<div style="border-radius:10px; padding:4px;text-align: center;background: #ccccFA;">
+		<span style="font-size:medium; font-weight:bold;">Permgen</span>
+		<br />
+		<span id="currentPermgen" style="font-size:xx-large; font-weight:bold;">0%</span>
+		<br />
+		<span style="font-size:xx-small;">as of <span id="permgenAsOf"></span></span>
+	</div>
+</div>
+<h4>JQuery Ajax Example with Timer</h4>
+<p>This example makes an ajax request for the permgen REST resource every 30 seconds, Updating an element on page with id <i>currentPermgen</i>.</p>
+<p>If youre running on windows and/or dont want to run conky, this might be the easiest option to display permgen in a tiny browser window.</p>
+<div style="border-radius:10px 10px 10px 10px;background: #cccccc; margin-top:5px; padding-top:5px;padding-left:15px;padding-bottom:5px;padding-right:15px;">
+<pre class="brush: js; toolbar: true;">
+$(document).ready(function(){
+	// initial call to update on first page draw
+	getPermgenAjaxTimerTask(); 
+	self.setInterval ("getPermgenAjaxTimerTask()", 30 * 1000);
+ });
+
+function getPermgenAjaxTimerTask() {
+	var asOf = new Date();
+	$.ajax({
+	    url: 'http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed',
+	    type: 'GET',
+	    data: '', 
+	    success: function(data) {
+	    	$('#currentPermgen').html(data+'%');
+	    	$('#permgenAsOf').html(asOf.getHours() + ":" 
+	    			+ asOf.getMinutes() + ":" + asOf.getSeconds());
+	    	}
+	});
+}
+</pre>
+</div>
+<script type="text/javascript">
+function getPermgenAjaxTimerTask() {
+	var asOf = new Date();
+	$.ajax({
+	    url: 'http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed',
+	    type: 'GET',
+	    data: '', 
+	    success: function(data) {
+	    	$('#currentPermgen').html(data+'%');
+	    	$('#permgenAsOf').html(asOf.getHours() + ":" 
+	    			+ asOf.getMinutes() + ":" + asOf.getSeconds());
+	    	}
+	});
+	// timer started in doc read fn.
+}
+</script>
+
+<hr />
+<h4>TODO: Windows Sidebar Widget</h4>
+<p>Perhaps someone will implement and contrib a Windows Sidebar Widget that consumes these REST resources?</p>
+<i>insert link to github project</i>
+<script type="text/javascript">
+     SyntaxHighlighter.all()
+</script>
+</ui:define>
+   </ui:composition>
+

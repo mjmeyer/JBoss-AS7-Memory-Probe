@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:h="http://java.sun.com/jsf/html"
+   template="/WEB-INF/templates/tiny.xhtml"
+   >
+   <ui:define name="head">
+   <h:outputScript name="js/gauge.js" target="head" />
+   <script type="text/javascript">
+   $(document).ready(function(){
+		
+		getPermgenAjaxTimerTask(); // initial call to update on first page draw
+		self.setInterval ("getPermgenAjaxTimerTask()", 30 * 1000);
+		getHeapAjaxTimerTask(); // initial call to update on first page draw
+		self.setInterval ("getHeapAjaxTimerTask()", 30 * 1000);
+	
+		gauge.add(document.getElementById("meter1"), {width:170, height:20, name: 'permgenMeter', radius:0.8, limit: true, gradient: true, scale: 10, colors:['#ffff00','#ff0000'], values:[0,100]}); 
+		gauge.add(document.getElementById("meter2"), {width:170, height:20, name: 'heapMeter', radius:0.8, limit: true, gradient: true, scale: 10, colors:['#ffff00','#ff0000'], values:[0,100]}); 
+	 });
+   </script>
+   <script type="text/javascript" src="http://malsup.github.com/jquery.corner.js"></script>
+   </ui:define>
+    
+   <ui:define name="content">
+   <table>
+   	<tr>
+   		<td valign="top">Permgen
+   		</td>
+   		<td>
+   			<div id="meter1">Meter1</div>
+   		</td>
+   		<td valign="top">
+   			<span id="currentPermgen" style="font-size:large; font-weight:bold;">0%</span>
+   		</td>
+   	</tr>
+   	<tr>
+   		<td valign="top">Heap
+   		</td>
+   		<td>
+   			<div id="meter2">Meter2</div>
+   		</td>
+   		<td valign="top">
+   			<span id="currentHeap" style="font-size:large; font-weight:bold;">0%</span>
+   		</td>
+   	</tr>
+   </table>
+   <div style="width:100%;margin-top:-9px;text-align:center;font-size:xx-small;">as of <span id="AsOf"></span></div>
+   
+
+    	
+
+
+
+
+
+
+<script type="text/javascript">
+function getPermgenAjaxTimerTask() {
+	var asOf = new Date();
+	$.ajax({
+	    url: 'http://localhost:8080/jbas7MemoryProbe/rest/permgen/percentUsed',
+	    type: 'GET',
+	    data: '', 
+	    success: function(data) {
+	    	$('#currentPermgen').html(data+'%');
+	    	$('#AsOf').html(asOf.getHours() + ":" 
+	    			+ asOf.getMinutes() + ":" + asOf.getSeconds());
+	    	gauge.modify(document.getElementById("permgenMeter"), {values:[data,100]});	
+	    }
+	});
+	// timer started in doc read fn.
+}
+
+function getHeapAjaxTimerTask() {
+	var asOf = new Date();
+	$.ajax({
+	    url: 'http://localhost:8080/jbas7MemoryProbe/rest/heap/percentUsed',
+	    type: 'GET',
+	    data: '', 
+	    success: function(data) {
+	    	$('#currentHeap').html(data+'%');
+	    	$('#AsOf').html(asOf.getHours() + ":" 
+	    			+ asOf.getMinutes() + ":" + asOf.getSeconds());
+	    	gauge.modify(document.getElementById("heapMeter"), {values:[data,100]});	
+	    }
+	});
+	// timer started in doc read fn.
+}
+</script>
+
+
+</ui:define>
+</ui:composition>
+
