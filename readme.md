@@ -17,11 +17,11 @@ A simple REST interface to the Jboss AS 7 memory metrics exposed by the JBoss [C
 Provides a simple way to get permgen and heap stats on local dev instances of JBoss AS 7 so they 
 can be exposed through things like Conky or other monitoring tools. 
 
-*Includes sample client implementations for
-- [Conky](http://conky.sourceforge.net/)
-- Syncrhonous Javascript
-- Asynchronous Javascript using JQuery
-- Embedded tiny javascript client
+Includes sample client implementations for
++	[Conky](http://conky.sourceforge.net/)
++	Syncrhonous Javascript
++	Asynchronous Javascript using JQuery
++	Embedded tiny javascript client
 
 ## Available REST resources
 
@@ -47,5 +47,6 @@ You can copy the downloadable .war file to your JBOSS_HOME/standalone/deployment
 navigate to: http://localhost:8080/jbas7MemoryProbe
 
 Or, if you wish to build & deploy from source using Maven 3 goals.
+
 	mvn package
 	mvn jboss-as:deploy
