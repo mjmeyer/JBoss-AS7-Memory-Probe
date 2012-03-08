@@ -18,10 +18,22 @@ Provides a simple way to get permgen and heap stats on local dev instances of JB
 can be exposed through things like Conky or other monitoring tools. 
 
 Includes sample client implementations for:
-- conky
-- Syncrhonous Javascript
-- Asynchronous Javascript using JQuery
-- Embedded tiny javascript client
+* conky
+* Syncrhonous Javascript
+* Asynchronous Javascript using JQuery
+* Embedded tiny javascript client
+
+## Available REST resources
+
+###Permgen
+    /rest/permgen - permgen / non-heap memory stats as JSON string
+    /rest/permgen/percentUsed - permgen / non-heap memory percent used as simple string. suitable for consumption by things like Conky or curl.
+    /rest/permgen/<attribute> - Extracts the passed attribute from the JSON result and returns as simple string suitable for consumption by things like Conky or curl.
+###Heap
+    /rest/heap - heap memory stats as JSON string
+    /rest/heap/percentUsed - heap memory percent used as simple string. suitable for consumption by things like Conky or curl.
+    /rest/heap/<attribute> - Extracts the passed attribute from the JSON result and returns as simple string suitable for consumption by things like Conky or curl.
+
 
 ##System requirements
 This is a deployable Maven 3, Java EE 6 project for JBoss AS 7.
@@ -34,6 +46,6 @@ All you need to build and run this project is Java 6.0 (Java SDK 1.6) or better,
 You can copy the downloadable .war file to your JBOSS_HOME/standalone/deployments directory and then 
 navigate to: http://localhost:8080/jbas7MemoryProbe
 
-If you wish to build & deploy from source using Maven 3:
+If you wish to build & deploy from source using Maven 3
 	mvn package
 	mvn jboss-as:deploy
