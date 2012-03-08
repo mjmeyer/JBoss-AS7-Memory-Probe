@@ -18,6 +18,7 @@ Provides a simple way to get permgen and heap stats on local dev instances of JB
 can be exposed through things like Conky or other monitoring tools. 
 
 Includes sample client implementations for
+
 +	[Conky](http://conky.sourceforge.net/)
 +	Syncrhonous Javascript
 +	Asynchronous Javascript using JQuery
